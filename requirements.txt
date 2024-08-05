@@ -2,3 +2,4 @@ telethon
 pyyaml
 discord.py
 python-dotenv
+flask
