@@ -2,6 +2,11 @@ import yaml
 import sys
 import logging
 import discord
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 ''' 
 ------------------------------------------------------------------------
@@ -10,12 +15,10 @@ import discord
 '''
 
 discord_client = discord.Client()
-with open('config.yml', 'rb') as f:
-    config = yaml.safe_load(f)
 
 ''' 
 ------------------------------------------------------------------------
-    MESSAGE AS WE RECIEVE FROM FORWARDGRAM SCRIPT
+    MESSAGE AS WE RECEIVE FROM FORWARDGRAM SCRIPT
 ------------------------------------------------------------------------
 '''
 
@@ -26,22 +29,18 @@ message = sys.argv[1]
     DISCORD SERVER START EVENT - We will kill this immaturely
 ------------------------------------------------------------------------
 '''
-# when discord is initalized, it will trigger this event. 
-# we quickly send messages to our discord channels and quit the script prematurely.
-# this gets trigged again when a new message is sent on channel from telegram
-
 @discord_client.event
 async def on_ready():
-
     print('We have logged in as {0.user}'.format(discord_client))
     print('Awaiting Telegram Message')
 
-    # My channels are for RTX card drops and PS5
-    channel_1 = discord_client.get_channel(config["discord_1_channel"])
-    channel_2 = discord_client.get_channel(config["discord_2_channel"])
-    channel_3 = discord_client.get_channel(config["discord_3_channel"])
-    channel_4 = discord_client.get_channel(config["discord_4_channel"])
+    # Retrieve channels from Discord using IDs from environment variables
+    channel_1 = discord_client.get_channel(int(os.getenv("DISCORD_1_CHANNEL")))
+    channel_2 = discord_client.get_channel(int(os.getenv("DISCORD_2_CHANNEL")))
+    channel_3 = discord_client.get_channel(int(os.getenv("DISCORD_3_CHANNEL")))
+    channel_4 = discord_client.get_channel(int(os.getenv("DISCORD_4_CHANNEL")))
 
+    # Send the message to the appropriate channel
     if 'Mario' in message:
         await channel_1.send(message)
     elif 'Zelda' in message:
@@ -53,9 +52,5 @@ async def on_ready():
 
     quit()
 
-discord_client.run(config["discord_bot_token"])
-
-    
-
-    
-
+# Run the Discord client using the bot token from environment variables
+discord_client.run(os.getenv("DISCORD_BOT_TOKEN"))
