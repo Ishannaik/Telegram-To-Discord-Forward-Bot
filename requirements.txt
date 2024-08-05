@@ -1,3 +1,4 @@
 telethon
 pyyaml
 discord.py
+python-dotenv
