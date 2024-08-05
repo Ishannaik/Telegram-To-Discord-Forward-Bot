@@ -5,10 +5,15 @@ import sys
 import logging
 import discord
 import subprocess
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 ''' 
 ------------------------------------------------------------------------
-                LOGGING - Initite logging for the Bot
+                LOGGING - Inititate logging for the Bot
 ------------------------------------------------------------------------
 '''
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -39,7 +44,7 @@ def start(config):
         if d.name in config["output_channel_names"] or d.entity.id in config["output_channel_ids"]:
             output_channel_entities.append(InputChannel(d.entity.id, d.entity.access_hash))
 
-    # Exit, dont wait for fire.        
+    # Exit, don't wait for fire.        
     if not output_channel_entities:
         logger.error(f"Could not find any output channels in the user's dialogs")
         sys.exit(1)
@@ -57,25 +62,15 @@ def start(config):
     @client.on(events.NewMessage(chats=input_channels_entities))
     async def handler(event):
         for output_channel in output_channel_entities:
-
-            # Uncomment the line below to print full message in structured format on your console.
-            #logging.info(f"Message Was: {event.message}")
-
-            # We will parse the items from response. You can first view the full message above,
-            # then decide which elements you want to parse from telegram response
-
-            # If our entities contain URL, we want to parse and send Message + URL
             try:
                 parsed_response = (event.message.message + '\n' + event.message.entities[0].url )
                 parsed_response = ''.join(parsed_response)
-            # Or else we only send Message    
             except:
                 parsed_response = event.message.message
 
-            # This is probably not the best way to do this but definitely the easiest way. 
-            # When message triggers you start discord messanger script in new thread and sends parsed input as sys.argv[1]
+            # Start discord messenger script and send the message
             subprocess.call(["python", "discord_messager.py", str(parsed_response)])
-            # this will forward your message to channel_recieve in Telegram
+            # Forward message to Telegram output channels
             await client.forward_messages(output_channel, event.message)  
 
     client.run_until_disconnected()
@@ -90,6 +85,10 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} {{CONFIG_PATH}}")
         sys.exit(1)
+    
+    # Load configuration from YAML file
     with open(sys.argv[1], 'rb') as f:
         config = yaml.safe_load(f)
+
+    # Start the bot
     start(config)
