@@ -1,7 +1,5 @@
-import yaml
-import sys
-import logging
 import discord
+import sys
 import os
 from dotenv import load_dotenv
 
@@ -10,7 +8,7 @@ load_dotenv()
 
 ''' 
 ------------------------------------------------------------------------
-    DISCORD CLIENT - Init the client
+    DISCORD CLIENT - Initialize the client
 ------------------------------------------------------------------------
 '''
 
@@ -26,7 +24,7 @@ message = sys.argv[1]
 
 ''' 
 ------------------------------------------------------------------------
-    DISCORD SERVER START EVENT - We will kill this immaturely
+    DISCORD SERVER START EVENT - We will send the message and exit
 ------------------------------------------------------------------------
 '''
 @discord_client.event
